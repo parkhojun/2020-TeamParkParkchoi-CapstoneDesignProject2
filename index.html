@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <title>지역 화폐 가맹점 맵.</title>
+    <style>
+        #mapwrap {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content {
+            bottom: 10px;
+            left: 7px;
+            display: none;
+            width: 10px;
+            text-align: left;
+            padding: 5px;
+            z-index: 10;
+            position: fixed;
+            font-size: 10px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            background-clip: padding-box;
+        }
+
+         .location {
+            bottom: 10px;
+            right: 10px;
+            display: block;
+            width: 30px;
+            text-align: center;
+            padding: 5px;
+            z-index: 10;
+            position: fixed;
+            font-size: 12px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            background-clip: padding-box;
+        }
+        
+        .content { /*가맹점 정보 CSS*/
+            bottom: 10px;
+            left: 7px;
+            display: none;
+            width: 10px;
+            text-align: left;
+            padding: 5px;
+            z-index: 10;
+            position: fixed;
+            font-size: 10px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            background-clip: padding-box;
+        } 
+        
+        .location_info {
+            position: fixed;
+            padding-top: 10px;
+            width: 170px;
+            height: 28px;
+            top: 20px;
+            right: 50px;
+            background-color: #067026;
+            color: #FFF;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .loading {
+            background: rgba(0, 0, 0, .5) no-repeat;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 999;
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            height: 28px;
+            width: 28px;
+            position: absolute;
+            top: calc(50% - 14px);
+            left: calc(50% - 14px);
+            animation: rotate 0.8s infinite linear;
+            border: 4px solid #fff;
+            border-right-color: transparent;
+            border-radius: 50%;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .category li {
+            list-style: none;
+            float: left;
+            width: 50px;
+            height: 25px;
+            padding-top: 5px;
+            cursor: pointer;
+        }
+
+        .category {
+            left: 7px;
+            top: 80px;
+            width: 50px;
+            height: 300px;
+            display: block;
+            text-align: center;
+            padding: 10px 0px 10px 0px;
+            z-index: 1001;
+            position: absolute;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            background-clip: padding-box;
+            /*overflow-y: scroll;*/
+        }
+
+        .category_item {
+            padding: 5px 5px 5px 5px;
+            background-color: white;
+            width: 100%;
+            min-height: 25px;
+            border: 0;
+            cursor: pointer;
+        }
+
+    </style>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="지역 화폐 가맹점 맵
+            화폐 가맹점을 카테고리 별로 알려드립니다." />
+    <!-- viewport : 모바일 등 PC가 아닌 환경에서 레이아웃 크기 조절 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+</head>
+
+<body>
+    <div class="content">
+        지역 화폐 가맹점 맵
+    </div>
+
+    <!-- 로딩 스피너 UI -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="mapwrap">
+        <!-- 지도가 표시될 div -->
+        <div id="map" style="width: 100%; height: 100vh;"></div>
+
+        <div class="location">
+            <a href="#" onclick="getCurrentLocation()">
+                <img src="./img/location.png" style="display: block;
+                        margin: 0 auto 2px;
+                        width: 27px;
+                        height: 27px;" />
+            </a>
+        </div>
+
+        <div class="category">
+            <button class="category_item" id="total" onclick="getData('total')">
+                    전체
+                </button>
+            <button class="category_item" id="restaurant" onclick="getData('restaurant')">
+                    음식
+                </button>
+            <button class="category_item" id="oil" onclick="getData('oil')">
+                    연료
+                </button>
+            <button class="category_item" id="mart" onclick="getData('mart')">
+                    마트
+                </button>
+            <button class="category_item" id="car" onclick="getData('car')">
+                    자동차
+                </button>
+            <button class="category_item" id="hotel" onclick="getData('hotel')">
+                    숙박
+                </button>
+            <button class="category_item" id="medical" onclick="getData('medical')">
+                    의료
+                </button>
+            <button class="category_item" id="study" onclick="getData('study')">
+                    학원
+                </button>
+            <button class="category_item" id="food" onclick="getData('food')">
+                    음료식품
+                </button>
+            <button class="category_item" id="leisure" onclick="getData('leisure')">
+                    레저
+                </button>
+            <button class="category_item" id="beauty" onclick="getData('beauty')">
+                    미용
+                </button>
+            <button class="category_item" id="other" onclick="getData('other')">
+                    미분류
+                </button>
+        </div>
+    </div>
+   
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f0d9a0fba4b55ca3c25b88e147048767&libraries=services,clusterer,drawing"></script>
+    <script type="text/JavaScript" src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+    <script src="./jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-164126135-1"></script>
+    <script>
+        Kakao.init("f0d9a0fba4b55ca3c25b88e147048767");      // 사용할 앱의 JavaScript 키를 설정
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-164126135-1');
+    </script>
+    <script src="./main.js"></script>
+</body>
+
+</html>
